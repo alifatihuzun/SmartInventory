@@ -361,3 +361,14 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Docker Local Override (Bunu gönderme, herkesin portu farklı olabilir)
+docker-compose.override.yml
+
+# Environment Specific Settings (Şifreler vs. olabilir, gönderme)
+appsettings.Development.json
+appsettings.local.json
+secrets.json
+
+# Visual Studio Code (Eğer kullanan varsa)
+.vscode/
