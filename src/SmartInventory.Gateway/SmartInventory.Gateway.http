@@ -1,0 +1,6 @@
+@SmartInventory.Gateway_HostAddress = http://localhost:5145
+
+GET {{SmartInventory.Gateway_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,6 @@
+@SmartInventory.Services.Order_HostAddress = http://localhost:5283
+
+GET {{SmartInventory.Services.Order_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

@@ -1,0 +1,101 @@
+version: '3.4'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: smartinventory-sql
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=StrongP@ssw0rd!
+    ports:
+      - "1433:1433"
+    networks:
+      - smartinventory-network
+
+  seq:
+    image: datalust/seq:latest
+    container_name: smartinventory-seq
+    environment:
+      - ACCEPT_EULA=Y
+    ports:
+      - "5341:5341"
+      - "8081:80"
+    networks:
+      - smartinventory-network
+
+  identity-service:
+    image: smartinventory/identity
+    build:
+      context: .
+      dockerfile: src/SmartInventory.Services.Identity/Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=SmartInventoryInfo_Identity;User Id=sa;Password=StrongP@ssw0rd!;TrustServerCertificate=True;
+    ports:
+      - "8004:8080"
+    depends_on:
+      - sqlserver
+    networks:
+      - smartinventory-network
+
+  product-service:
+    image: smartinventory/product
+    build:
+      context: .
+      dockerfile: src/SmartInventory.Services.Product/Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=SmartInventoryInfo_Product;User Id=sa;Password=StrongP@ssw0rd!;TrustServerCertificate=True;
+    ports:
+      - "8001:8080"
+    depends_on:
+      - sqlserver
+    networks:
+      - smartinventory-network
+
+  supplier-service:
+    image: smartinventory/supplier
+    build:
+      context: .
+      dockerfile: src/SmartInventory.Services.Supplier/Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=SmartInventoryInfo_Supplier;User Id=sa;Password=StrongP@ssw0rd!;TrustServerCertificate=True;
+    ports:
+      - "8003:8080"
+    depends_on:
+      - sqlserver
+    networks:
+      - smartinventory-network
+
+  order-service:
+    image: smartinventory/order
+    build:
+      context: .
+      dockerfile: src/SmartInventory.Services.Order/Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=SmartInventoryInfo_Order;User Id=sa;Password=StrongP@ssw0rd!;TrustServerCertificate=True;
+    ports:
+      - "8002:8080"
+    depends_on:
+      - sqlserver
+    networks:
+      - smartinventory-network
+
+  gateway-service:
+    image: smartinventory/gateway
+    build:
+      context: .
+      dockerfile: src/SmartInventory.Gateway/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "8000:8080"
+    depends_on:
+      - identity-service
+      - product-service
+      - supplier-service
+      - order-service
+    networks:
+      - smartinventory-network
+
+networks:
+  smartinventory-network:
+    driver: bridge
